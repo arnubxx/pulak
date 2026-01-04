@@ -51,7 +51,7 @@ def predict(img: Image.Image, model) -> np.ndarray:
     return probs
 
 def main():
-    st.title("Pulak Image Classifier")
+def main():
 
     model_path = "MobileNetV2_best_model.h5"
     if not os.path.exists(model_path):
@@ -69,7 +69,6 @@ def main():
 
     if uploaded:
         img = Image.open(uploaded)
-        st.image(img, caption="Input Image", use_column_width=True)
 
         probs = predict(img, model)
         n = len(probs)
@@ -77,9 +76,7 @@ def main():
         top_idx = int(np.argmax(probs))
         top_label = labels[top_idx]
         confidence = float(probs[top_idx])
-
-        # Show only the predicted class name (no percentages/graphs)
-        st.write(top_label)
+    st.write(top_label)
 
     st.caption("Powered by MobileNetV2")
 
