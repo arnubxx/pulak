@@ -78,9 +78,8 @@ def main():
         top_label = labels[top_idx]
         confidence = float(probs[top_idx])
 
-        st.subheader("Prediction")
-        st.success(f"Class: {top_label}")
-        st.write(f"Confidence: {confidence:.2%}")
+        # Show only the predicted class name (no percentages/graphs)
+        st.write(top_label)
 
     st.caption("Powered by MobileNetV2")
 
