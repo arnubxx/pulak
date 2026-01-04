@@ -7,18 +7,28 @@ from PIL import Image
 
 st.set_page_config(page_title="Pulak Image Classifier", page_icon="🧠", layout="centered")
 
+# Fixed class names provided by user
+CLASS_NAMES = [
+    "Leaf_Spot",
+    "Abnormal",
+    "Anthracnose",
+    "Leaf_Blight",
+    "Powdery_Mildew",
+    "Dry_Leaf",
+    "Healthy",
+    "Black_Spot",
+]
+
 @st.cache_resource
 def load_model(model_path: str = "MobileNetV2_best_model.h5"):
     # compile=False avoids needing optimizer/loss during load and helps
     # compatibility across TF/Keras versions.
     return tf.keras.models.load_model(model_path, compile=False)
 
-@st.cache_data
-def parse_labels(text: str, num_classes: int):
-    labels = [l.strip() for l in text.splitlines() if l.strip()]
-    if len(labels) != num_classes:
-        labels = [f"class_{i}" for i in range(num_classes)]
-    return labels
+def get_labels(num_classes: int):
+    if len(CLASS_NAMES) == num_classes:
+        return CLASS_NAMES
+    return [f"class_{i}" for i in range(num_classes)]
 
 def preprocess_image(img: Image.Image) -> np.ndarray:
     img = img.convert("RGB")
@@ -51,13 +61,6 @@ def main():
     with st.spinner("Loading model..."):
         model = load_model(model_path)
 
-    st.sidebar.header("Settings")
-    top_k = st.sidebar.slider("Top K", min_value=1, max_value=10, value=3)
-    label_text = st.sidebar.text_area(
-        "Class labels (optional)",
-        help="One label per line; leave empty to use generic names.",
-    )
-
     uploaded = st.file_uploader(
         "Upload an image",
         type=["jpg", "jpeg", "png", "bmp", "webp"],
@@ -67,16 +70,17 @@ def main():
     if uploaded:
         img = Image.open(uploaded)
         st.image(img, caption="Input Image", use_column_width=True)
+
         probs = predict(img, model)
         n = len(probs)
-        labels = parse_labels(label_text, n)
-        k = min(top_k, n)
-        idxs = np.argsort(probs)[::-1][:k]
+        labels = get_labels(n)
+        top_idx = int(np.argmax(probs))
+        top_label = labels[top_idx]
+        confidence = float(probs[top_idx])
 
-        st.subheader("Predictions")
-        rows = [{"label": labels[i], "probability": float(probs[i])} for i in idxs]
-        st.dataframe(rows, use_container_width=True)
-        st.bar_chart({labels[i]: float(probs[i]) for i in idxs})
+        st.subheader("Prediction")
+        st.success(f"Class: {top_label}")
+        st.write(f"Confidence: {confidence:.2%}")
 
     st.caption("Powered by MobileNetV2")
 
