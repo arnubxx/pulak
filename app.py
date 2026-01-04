@@ -9,7 +9,9 @@ st.set_page_config(page_title="Pulak Image Classifier", page_icon="🧠", layout
 
 @st.cache_resource
 def load_model(model_path: str = "MobileNetV2_best_model.h5"):
-    return tf.keras.models.load_model(model_path)
+    # compile=False avoids needing optimizer/loss during load and helps
+    # compatibility across TF/Keras versions.
+    return tf.keras.models.load_model(model_path, compile=False)
 
 @st.cache_data
 def parse_labels(text: str, num_classes: int):
