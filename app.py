@@ -34,7 +34,8 @@ def preprocess_image(img: Image.Image) -> np.ndarray:
     img = img.convert("RGB")
     img = img.resize((224, 224))
     arr = np.array(img, dtype=np.float32)
-    arr = tf.keras.applications.mobilenet_v2.preprocess_input(arr)
+    # Use DenseNet201 preprocessing
+    arr = tf.keras.applications.densenet.preprocess_input(arr)
     return np.expand_dims(arr, axis=0)
 
 def normalize_probs(logits: np.ndarray) -> np.ndarray:
@@ -53,7 +54,7 @@ def predict(img: Image.Image, model) -> np.ndarray:
 def main():
 def main():
 
-    model_path = "MobileNetV2_best_model.h5"
+    model_path = "DenseNet201_full_model.h5"
     if not os.path.exists(model_path):
         st.error(f"Model file not found: {model_path}")
         return
