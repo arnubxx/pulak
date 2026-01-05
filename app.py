@@ -52,8 +52,6 @@ def predict(img: Image.Image, model) -> np.ndarray:
     return probs
 
 def main():
-def main():
-
     model_path = "DenseNet201_full_model.h5"
     if not os.path.exists(model_path):
         st.error(f"Model file not found: {model_path}")
@@ -70,16 +68,12 @@ def main():
 
     if uploaded:
         img = Image.open(uploaded)
-
         probs = predict(img, model)
         n = len(probs)
         labels = get_labels(n)
         top_idx = int(np.argmax(probs))
         top_label = labels[top_idx]
-        confidence = float(probs[top_idx])
-    st.write(top_label)
-
-    st.caption("Powered by MobileNetV2")
+        st.write(top_label)
 
 if __name__ == "__main__":
     main()
